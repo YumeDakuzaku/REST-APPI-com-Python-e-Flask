@@ -1,0 +1,859 @@
+#Instalando e configurando o ambiente virtual
+#cria a pasta do projeto "REST API com Python e Flask"
+# verificar a versão do python = python -- version
+
+#Instalar ambiente virtual = pip install virtualenv
+#Criar ambiente virtual: virtualenv ambvir --python=python3.9
+
+#Para acessar o ambiente virtual se estiver no windows
+./ambvir/Scripts/activate.bat
+#No linux
+#source ambvir/bin/activate
+
+#Pode ser que o comando 
+#.\NomeDoAmbienteVirtual\Scripts\activate.bat para ativar o 
+
+#Ambiente Virtual no WIndows, não funcione. Caso isso ocorra, 
+#utilize o comando:  .\NomeDoAmbienteVirtual\Scripts\activate.ps1
+
+#Se tiver problemas de acesso não autorizado, 
+#execute: Set-ExecutionPolicy Unrestricted -Scope Process e tente novamente. 
+#Esse comando autoriza a execução desse comando apenas no powershell aberto.
+
+
+#Para indicar todas as bibliotecas instaladas digitar: pip freeze
+
+#importante criar ambiente virtual, pq sempre vai funcionar na versão q vc colocou e se for rodar em outra máquina
+#digita  pip install -r requirements.txt  para instalar todas as bibliotecas e versões necessárias
+
+-----------------------------------------------------------------------
+#Instalar a biblioteca flask: pip install Flask
+#Instalar a biblicleca flask restful: pip install Flask-Restful
+
+
+----------------------------------------------------------------------
+cria o app.py dentro da pasta REST API com Python e Flask
+
+from flask import Flask
+from flask_restful import Resource, Api
+
+app = Flask(__name__)
+api = Api(app)
+
+#Vamos criar um rest sobre hoteis, para pesquisar por cidade, estrelas, etc
+
+class Hoteis(Resource): #todo recurso tem as versões get, post, put e delete
+    def get(self):
+        return {'hoteis':'meus hoteis'} #é um dicionário, mas depois será convertido em json
+
+api.add_resource(Hoteis, '/hoteis') #coloca o nome da classe e de onte deverá ser chamado
+
+if __name__ == '__main__':
+    app.run(debug=True)
+
+
+------------------------------------------------------------------------
+#executa: python app.py
+#vai mostrar o endereço que está rodando:
+#Running on http://127.0.0.1:5000/
+#vai no postman cria pasta REST API e add request 'hoteis' http://127.0.0.1:5000/hoteis e clica send
+
+-----------------------------------------------------------------------
+#Agora no mesmo código vou adicionar uma lista de hotéis para que seja retornado da classe criada
+
+from flask import Flask
+from flask_restful import Resource, Api
+
+app = Flask(__name__)
+api = Api(app)
+
+#vou add a lista de hotéis 
+#criando uma lista de hoteis que depois vai retornar da classe:
+
+hoteis = [ 
+		{
+		'hoteis_id':'alpha',
+		'nome':'Alpha Hotel',
+		'estrelas':4.3,
+		'diaria':420.34,
+		'cidade': 'Rio de Janeiro'
+		},
+		
+				{
+		'hoteis_id':'Bravo',
+		'nome':'Bravo Hotel',
+		'estrelas':4.4,
+		'diaria':380.90,
+		'cidade': 'Santa Catarina'
+		},
+		
+				{
+		'hoteis_id':'charlie',
+		'nome':'Charlie Hotel',
+		'estrelas':3.9,
+		'diaria':320.20,
+		'cidade': 'Santa Catarina' #última linha não precisa de vírgula
+		}
+]
+
+
+class Hoteis(Resource): 
+    def get(self):
+        return {'hoteis':'hoteis'} 
+
+api.add_resource(Hoteis, '/hoteis')
+
+if __name__ == '__main__':
+    app.run(debug=True)
+---------------------------------------------------------------------
+#Refatorando: Criando o pacote resources (vamos criar uma pasta nova Resource e vamos colocar todos os recursos que nossa api vai ter, dentro dessa pasta vamos criar hotel.py e __init__.py
+#dentro de hotel.py vamos inserir tudo que é referente ao hotel
+
+#dentro de hoteis.py
+
+from flask_restful import Resource
+
+hoteis = [
+		{
+		'hoteis_id':'alpha',
+		'nome':'Alpha Hotel',
+		'estrelas':4.3,
+		'diaria':420.34,
+		'cidade': 'Rio de Janeiro'
+		},
+
+		{
+		'hoteis_id':'Bravo',
+		'nome':'Bravo Hotel',
+		'estrelas':4.4,
+		'diaria':380.90,
+		'cidade': 'Santa Catarina'
+		},
+
+		{
+		'hoteis_id':'charlie',
+		'nome':'Charlie Hotel',
+		'estrelas':3.9,
+		'diaria':320.20,
+		'cidade': 'Santa Catarina' #última linha não precisa de vírgula
+		}
+]
+
+class Hoteis(Resource):
+    def get(self):
+        return {'hoteis': hoteis}
+
+
+
+
+-------------------------------------
+#dentro de app.py
+
+
+from flask import Flask
+from flask_restful import Api
+from resources.hotel import Hoteis
+
+app = Flask(__name__)
+api = Api(app)
+
+api.add_resource(Hoteis, '/hoteis')
+
+if __name__ == '__main__':
+    app.run(debug=True)
+	
+-------------------------------------------
+
+#Implementando GET hotel
+#lá no postman vamos adicionar as request de post, put e  delete 
+
+
+#dentro de app.py
+
+
+from flask import Flask
+from flask_restful import Api
+from resources.hotel import Hoteis
+
+app = Flask(__name__)
+api = Api(app)
+
+api.add_resource(Hoteis, '/hoteis')
+api.add.resource(Hotel, '/hoteis/<string:hotel_id>) #criando um novo endpoint, como vai ser string tem que colocar dessa forma,  e precisamos criar a classe chamada hotel e no pacote resources criar hotel
+
+if __name__ == '__main__':
+    app.run(debug=True)
+	
+---------------------------------------------
+#dentro de hotel.py
+
+from flask_restful import Resource
+
+hoteis = [
+		{
+		'hoteis_id':'alpha',
+		'nome':'Alpha Hotel',
+		'estrelas':4.3,
+		'diaria':420.34,
+		'cidade': 'Rio de Janeiro'
+		},
+
+		{
+		'hoteis_id':'Bravo',
+		'nome':'Bravo Hotel',
+		'estrelas':4.4,
+		'diaria':380.90,
+		'cidade': 'Santa Catarina'
+		},
+
+		{
+		'hoteis_id':'charlie',
+		'nome':'Charlie Hotel',
+		'estrelas':3.9,
+		'diaria':320.20,
+		'cidade': 'Santa Catarina' #última linha não precisa de vírgula
+		}
+]
+
+class Hoteis(Resource):
+    def get(self):
+        return {'hoteis': hoteis}
+
+class Hotel(Resource):
+    def get(self):
+        pass
+
+    def post(self):
+        pass
+
+    def put(self):
+        pass
+
+    def delete(self):
+        pass
+		
+----------------------------------------------------------
+#dentro de hotel.py
+
+
+from flask_restful import Resource
+
+hoteis = [
+		{
+		'hotel_id':'alpha',
+		'nome':'Alpha Hotel',
+		'estrelas':4.3,
+		'diaria':420.34,
+		'cidade': 'Rio de Janeiro'
+		},
+
+		{
+		'hotel_id':'bravo',
+		'nome':'Bravo Hotel',
+		'estrelas':4.4,
+		'diaria':380.90,
+		'cidade': 'Santa Catarina'
+		},
+
+		{
+		'hotel_id':'charlie',
+		'nome':'Charlie Hotel',
+		'estrelas':3.9,
+		'diaria':320.20,
+		'cidade': 'Santa Catarina' #última linha não precisa de vírgula
+		}
+]
+
+class Hoteis(Resource):
+    def get(self):
+        return {'hoteis': hoteis}
+
+
+class Hotel(Resource):
+    def get(self, hotel_id):
+        for hotel in hoteis:
+            if hotel['hotel_id'] == hotel_id:
+                return hotel
+        return {'message': 'Hotel não encontrado.'}, 404 #código do not found
+
+    def post(self, hotel_id):
+        pass
+
+    def put(self, hotel_id):
+        pass
+
+    def delete(self, hotel_id):
+        pass
+
+
+
+------------------------
+dentro de app.py 
+
+from flask import Flask
+from flask_restful import Api
+from resources.hotel import Hoteis, Hotel #add a classe hotel para fazer referência
+
+app = Flask(__name__)
+api = Api(app)
+
+api.add_resource(Hoteis, '/hoteis')
+api.add_resource(Hotel, '/hoteis/<string:hotel_id>')
+
+if __name__ == '__main__':
+    app.run(debug=True)
+
+
+-----------------------------------
+
+#faça os testes no postman
+--------------------------------------
+
+#implementando o post 
+# é um pouco mais complicado pq vai receber todos os dados em json
+
+
+from flask_restful import Resource, reqparse #bibilioteca reqparse para receber todos elementos da requisição post
+#no postman cria um novo hotel em body - raw - json e cola o modelo tirando hotel_id da primeira linha 
+#adiciona os argumentos que quer citar, é importante para que pegue apenas os argumentos definidos e não os outros
+#dados é chave e valor dos argumentos passados
+#dados do novo_hotel é como se fosse um novo dicionário 
+
+hoteis = [
+		{
+		'hotel_id':'alpha',
+		'nome':'Alpha Hotel',
+		'estrelas':4.3,
+		'diaria':420.34,
+		'cidade': 'Rio de Janeiro'
+		},
+
+		{
+		'hotel_id':'bravo',
+		'nome':'Bravo Hotel',
+		'estrelas':4.4,
+		'diaria':380.90,
+		'cidade': 'Santa Catarina'
+		},
+
+		{
+		'hotel_id':'charlie',
+		'nome':'Charlie Hotel',
+		'estrelas':3.9,
+		'diaria':320.20,
+		'cidade': 'Santa Catarina' #última linha não precisa de vírgula
+		}
+]
+
+class Hoteis(Resource):
+    def get(self):
+        return {'hoteis': hoteis}
+
+
+class Hotel(Resource):
+    def get(self, hotel_id):
+        for hotel in hoteis:
+            if hotel['hotel_id'] == hotel_id:
+                return hotel
+        return {'message': 'Hotel não encontrado.'}, 404 #código do not found
+
+    def post(self, hotel_id):
+        argumentos = reqparse.RequestParser()
+        argumentos.add_argument('nome')
+        argumentos.add_argument('estrelas')
+        argumentos.add_argument('diaria')
+        argumentos.add_argument('cidade')
+
+        dados = argumentos.parse_args()
+
+        novo_hotel= {
+            'hotel_id': hotel_id,
+            'nome':dados['nome'],
+            'estrelas':dados['estrelas'],
+            'diaria':dados['diaria'],
+            'cidade':dados['cidade']
+        }
+
+        hoteis.append(novo_hotel)
+        return novo_hotel, 200
+
+    def put(self, hotel_id):
+        pass
+
+    def delete(self, hotel_id):
+        pass
+
+
+----------------------------------------------
+
+#implementando o PUT HOTEL
+#recebe no corpo um json no postman se passar um id que existe ele atualiza e se for um id que não tem ele adiciona
+#se o hotel já existe ele vai atualizar, se o hotel não existe ele vai criar
+#se um código se repete é mais fácil criar como um atributo da classe e depois chama-lá.
+#dentro da classe hotel ele criou uma função para poder chama-lá
+#o returno interrope a função então ele faz um ou outro
+# no put primeiro ele verifica se ohotel já existe e utiliza a opção hotel.update para atualizar caso já exista
+# parse_args chama o construtor que fizemos de argumentos 
+# conceito de **args e **kwargs para dicionários  (simplifica a forma que pode chamar os dados, se precisa add um novo argumento ele já puxa automaico)
+
+
+
+
+
+from flask_restful import Resource, reqparse
+
+hoteis = [
+		{
+		'hotel_id':'alpha',
+		'nome':'Alpha Hotel',
+		'estrelas':4.3,
+		'diaria':420.34,
+		'cidade': 'Rio de Janeiro'
+		},
+
+		{
+		'hotel_id':'bravo',
+		'nome':'Bravo Hotel',
+		'estrelas':4.4,
+		'diaria':380.90,
+		'cidade': 'Santa Catarina'
+		},
+
+		{
+		'hotel_id':'charlie',
+		'nome':'Charlie Hotel',
+		'estrelas':3.9,
+		'diaria':320.20,
+		'cidade': 'Santa Catarina'
+		}
+]
+
+class Hoteis(Resource):
+    def get(self):
+        return {'hoteis': hoteis}
+
+
+class Hotel(Resource):
+    argumentos = reqparse.RequestParser()
+    argumentos.add_argument('nome')
+    argumentos.add_argument('estrelas')
+    argumentos.add_argument('diaria')
+    argumentos.add_argument('cidade')
+
+    def find_hotel(hotel_id):
+        for hotel in hoteis:
+            if hotel['hotel_id'] == hotel_id:
+                return hotel
+        return None
+
+    def get(self, hotel_id):
+        hotel = Hotel.find_hotel(hotel_id)
+        if hotel:
+            return hotel
+        return {'message': 'Hotel não encontrado.'}, 404 #código do not found
+
+    def post(self, hotel_id):
+        dados = Hotel.argumentos.parse_args()
+        novo_hotel = {'hotel_id': hotel_id, **dados}
+
+        hoteis.append(novo_hotel)
+        return novo_hotel, 200
+
+    def put(self, hotel_id):
+
+        dados = Hotel.argumentos.parse_args()
+        novo_hotel = {'hotel_id': hotel_id, **dados}
+
+        hotel = Hotel.find_hotel(hotel_id)
+
+        if hotel:
+            hotel.update(novo_hotel)
+            return novo_hotel, 200
+        hoteis.append(novo_hotel)
+        return novo_hotel, 201 #hotel criado
+
+    def delete(self, hotel_id):
+        pass
+
+-------------------------------------------------------------
+
+#implementando o DELETE hotel
+
+
+from flask_restful import Resource, reqparse
+
+hoteis = [
+		{
+		'hotel_id':'alpha',
+		'nome':'Alpha Hotel',
+		'estrelas':4.3,
+		'diaria':420.34,
+		'cidade': 'Rio de Janeiro'
+		},
+
+		{
+		'hotel_id':'bravo',
+		'nome':'Bravo Hotel',
+		'estrelas':4.4,
+		'diaria':380.90,
+		'cidade': 'Santa Catarina'
+		},
+
+		{
+		'hotel_id':'charlie',
+		'nome':'Charlie Hotel',
+		'estrelas':3.9,
+		'diaria':320.20,
+		'cidade': 'Santa Catarina'
+		}
+]
+
+class Hoteis(Resource):
+    def get(self):
+        return {'hoteis': hoteis}
+
+
+class Hotel(Resource):
+    argumentos = reqparse.RequestParser()
+    argumentos.add_argument('nome')
+    argumentos.add_argument('estrelas')
+    argumentos.add_argument('diaria')
+    argumentos.add_argument('cidade')
+
+    def find_hotel(hotel_id):
+        for hotel in hoteis:
+            if hotel['hotel_id'] == hotel_id:
+                return hotel
+        return None
+
+    def get(self, hotel_id):
+        hotel = Hotel.find_hotel(hotel_id)
+        if hotel:
+            return hotel
+        return {'message': 'Hotel não encontrado.'}, 404 #código do not found
+
+    def post(self, hotel_id):
+        dados = Hotel.argumentos.parse_args()
+        novo_hotel = {'hotel_id': hotel_id, **dados}
+
+        hoteis.append(novo_hotel)
+        return novo_hotel, 200
+
+    def put(self, hotel_id):
+
+        dados = Hotel.argumentos.parse_args()
+        novo_hotel = {'hotel_id': hotel_id, **dados}
+
+        hotel = Hotel.find_hotel(hotel_id)
+
+        if hotel:
+            hotel.update(novo_hotel)
+            return novo_hotel, 200
+        hoteis.append(novo_hotel)
+        return novo_hotel, 201 #hotel criado
+
+    def delete(self, hotel_id):
+        global hoteis #para não dar erro de referência
+        hoteis = [hotel for hotel in hoteis if hotel['hotel_id'] != hotel_id]
+        return {'message':'Hotel deletado.'}
+
+
+
+
+--------------------------------
+
+CRIANDO UMA CLASSE MODELO PARA HOTEL
+
+#cria uma pasta chamada models dentro dela inserir: __init__.py e models.py
+#recorta o código de hotel.py e cola em models.py
+
+
+
+class HotelModel:
+    def __init__(self,hotel_id,nome,estrelas,diaria,cidade):
+        self.hotel_id = hotel_id
+        self.nome = nome
+        self.estrelas = estrelas
+        self.diaria = diaria
+        self.cidade = cidade
+
+    def json(self):
+        return {
+        'hotel_id':self.hotel_id,
+        'nome': self.nome,
+        'estrelas': self.estrelas,
+        'diaria': self.diaria,
+        'cidade': self.cidade
+        }
+
+
+
+----------------------------------------
+
+#em hotel.py faz a referência:
+
+
+
+from flask_restful import Resource, reqparse
+from models.hotel import HotelModel
+
+hoteis = [
+		{
+		'hotel_id':'alpha',
+		'nome':'Alpha Hotel',
+		'estrelas':4.3,
+		'diaria':420.34,
+		'cidade': 'Rio de Janeiro'
+		},
+
+		{
+		'hotel_id':'bravo',
+		'nome':'Bravo Hotel',
+		'estrelas':4.4,
+		'diaria':380.90,
+		'cidade': 'Santa Catarina'
+		},
+
+		{
+		'hotel_id':'charlie',
+		'nome':'Charlie Hotel',
+		'estrelas':3.9,
+		'diaria':320.20,
+		'cidade': 'Santa Catarina'
+		}
+]
+
+
+class Hoteis(Resource):
+    def get(self):
+        return {'hoteis': hoteis}
+
+
+class Hotel(Resource):
+    argumentos = reqparse.RequestParser()
+    argumentos.add_argument('nome')
+    argumentos.add_argument('estrelas')
+    argumentos.add_argument('diaria')
+    argumentos.add_argument('cidade')
+
+    def find_hotel(hotel_id):
+        for hotel in hoteis:
+            if hotel['hotel_id'] == hotel_id:
+                return hotel
+        return None
+
+    def get(self, hotel_id):
+        hotel = Hotel.find_hotel(hotel_id)
+        if hotel:
+            return hotel
+        return {'message': 'Hotel não encontrado.'}, 404 #código do not found
+
+    def post(self, hotel_id):
+        dados = Hotel.argumentos.parse_args()
+        hotel_objeto = HotelModel(hotel_id,**dados)
+        novo_hotel = hotel_objeto.json()
+        hoteis.append(novo_hotel)
+        return novo_hotel, 200
+
+    def put(self, hotel_id):
+        dados = Hotel.argumentos.parse_args()
+        hotel_objeto = HotelModel(hotel_id,**dados)
+        novo_hotel = hotel_objeto.json()
+        hotel = Hotel.find_hotel(hotel_id)
+        if hotel:
+            hotel.update(novo_hotel)
+            return novo_hotel, 200
+        hoteis.append(novo_hotel)
+        return novo_hotel, 201 #hotel criado
+
+    def delete(self, hotel_id):
+        global hoteis #para não dar erro de referência
+        hoteis = [hotel for hotel in hoteis if hotel['hotel_id'] != hotel_id]
+        return {'message':'Hotel deletado.'}
+
+
+-------------------------------------------------
+#criar bd manual
+#ele fez e deletou por não precisar mais do arquivo
+
+
+import sqlite3 #biblioteca que já está embutida no python
+
+connection = sqlite3.connect('banco.db')
+cursor = connection.cursor()
+
+cria_tabela = "CREATE TABLE IF NOT EXISTS hoteis (hotel_id text PRIMARY KEY,nome text, estrelas real, diaria real, cidade text)"
+
+cria_hotel = "INSERT INTO hoteis VALUES ('alpha','Alpha Hotel',4.3,345.30, 'Rio de Janeiro')"
+cursor.execute(cria_tabela)
+cursor.execute(cria_hotel)
+
+connection.commit()
+connection.close()
+
+
+-------------------------------------------------
+
+etc etc...
+
+
+------------------------------------------------------
+resources - hotel..py
+
+
+from flask_restful import Resource, reqparse
+from models.hotel import HotelModel
+
+hoteis = [
+		{
+		'hotel_id':'alpha',
+		'nome':'Alpha Hotel',
+		'estrelas':4.3,
+		'diaria':420.34,
+		'cidade': 'Rio de Janeiro'
+		},
+		{
+		'hotel_id':'bravo',
+		'nome':'Bravo Hotel',
+		'estrelas':4.4,
+		'diaria':380.90,
+		'cidade': 'Santa Catarina'
+		},
+		{
+		'hotel_id':'charlie',
+		'nome':'Charlie Hotel',
+		'estrelas':3.9,
+		'diaria':320.20,
+		'cidade': 'Santa Catarina'
+		}
+]
+
+class Hoteis(Resource):
+    def get(self):
+        return {'hoteis': hoteis}
+
+class Hotel(Resource):
+    atributos = reqparse.RequestParser()
+    atributos.add_argument('nome')
+    atributos.add_argument('estrelas')
+    atributos.add_argument('diaria')
+    atributos.add_argument('cidade')
+
+    def get(self, hotel_id):
+        hotel = Hotel.find_hotel(hotel_id)
+        if hotel:
+            return hotel
+        return {'message': 'Hotel não encontrado.'}, 404 #código do not found
+
+    def post(self, hotel_id):
+        if HotelModel.find_hotel(hotel_id):
+            return {"message":"Esse hotel id '{}' já existe.".format(hotel_id)}, 400 #Bad RequestParser
+
+        dados = Hotel.atributos.parse_args()
+        hotel = HotelModel(hotel_id,**dados)
+        hotel.save_hotel()
+        return hotel.json()
+
+    def put(self, hotel_id):
+        dados = Hotel.atributos.parse_args()
+        hotel_objeto = HotelModel(hotel_id,**dados)
+        novo_hotel = hotel_objeto.json()
+        hotel = Hotel.find_hotel(hotel_id)
+        if hotel:
+            hotel.update(novo_hotel)
+            return novo_hotel, 200
+        hoteis.append(novo_hotel)
+        return novo_hotel, 201 #hotel criado
+
+    def delete(self, hotel_id):
+        global hoteis #para não dar erro de referência
+        hoteis = [hotel for hotel in hoteis if hotel['hotel_id'] != hotel_id]
+        return {'message':'Hotel deletado.'}
+
+
+
+
+--------------------------------------------
+#app.py
+
+
+from flask import Flask
+from flask_restful import Api
+from resources.hotel import Hoteis, Hotel
+
+app = Flask(__name__)
+
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///banco.db'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+api = Api(app)
+
+@app.before_first_request
+def cria_banco():
+    banco.create_all()
+
+api.add_resource(Hoteis, '/hoteis')
+api.add_resource(Hotel, '/hoteis/<string:hotel_id>')
+
+if __name__ == '__main__':
+    from sql_alchemy import banco
+    banco.init_app(app)
+    app.run(debug=True)
+
+
+
+-------------------------------------
+#sql alchemy
+
+
+from flask_sqlalchemy import SQLAlchemy
+banco = SQLAlchemy()
+
+
+
+
+
+-----------
+
+#dentro de models
+from sql_alchemy import banco
+
+class HotelModel(banco.Model):
+    __tablename__ = 'hoteis'
+
+    hotel_id = banco.Column(banco.String, primary_key=True)
+    nome = banco.Column(banco.String(80))
+    estrelas = banco.Column(banco.Float(precision=1))
+    diaria = banco.Column(banco.Float(precision=2))
+    cidade = banco.Column(banco.String(40))
+
+
+    def __init__(self, hotel_id, nome, estrelas, diaria, cidade):
+        self.hotel_id = hotel_id
+        self.nome = nome
+        self.estrelas = estrelas
+        self.diaria = diaria
+        self.cidade = cidade
+
+    def json(self):
+        return {
+        'hotel_id':self.hotel_id,
+        'nome': self.nome,
+        'estrelas': self.estrelas,
+        'diaria': self.diaria,
+        'cidade': self.cidade
+        }
+
+    @classmethod
+    def find_hotel(cls, hotel_id):
+        hotel = cls.query.filter_by(hotel_id=hotel_id).first() #SELECT*FROM hoteis WHERE hotels_id=$hotel_id
+        if hotel:
+            return hotel
+        return None
+
+    def save_hotel(self):
+        banco.session.add(self)
+        banco.session.commit()
+
+---------------------------------------------------
+
+
